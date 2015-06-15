@@ -1,2 +1,4 @@
-# fedora-azure-img-prep
-Image processing for azure
+fedora-azure-img-prep
+=============================
+
+scripts to prepare Fedora cloud images for Azure
