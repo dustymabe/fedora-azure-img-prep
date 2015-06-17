@@ -87,6 +87,11 @@ chcon --reference ${TMPMNT}/${CLOUDINITLOGCFGFILE} ${TMPMNT}/${AZURECLOUDCFGFILE
 # Install the Azure specific agent
 dnf install -y --installroot ${TMPMNT} WALinuxAgent
 
+# Put in symlink from walinuxagent.service -> waagent.service
+# This is needed because cloud-init run's "service walinuxagent start"
+# on boot.
+ln -s /usr/lib/systemd/system/waagent.service ${TMPMNT}/usr/lib/systemd/system/walinuxagent.service
+
 # Install kernel-modules (needed for udf.ko.xz so we can mount the "cdrom"
 # azure attaches to the instance).
 VR=$(rpm -q kernel-core --qf "%{VERSION}-%{RELEASE}" --root ${TMPMNT})
