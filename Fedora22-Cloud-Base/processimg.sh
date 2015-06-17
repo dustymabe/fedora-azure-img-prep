@@ -46,7 +46,7 @@ export CLOUDINITLOGCFGFILE='/etc/cloud/cloud.cfg.d/05_logging.cfg'
 mkdir -p $TMPMNT && cd $WORKDIR
 
 # Get any additional rpms that we need
-dnf install -y wget qemu-img
+dnf install -y wget qemu-img xz
 
 # Get the xz image and decompress it
 wget $XZIMGURL && unxz $XZIMG
