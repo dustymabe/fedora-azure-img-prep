@@ -25,7 +25,7 @@
 set -eux 
 mkdir -p /tmp/azureimg/
 
-docker run -i --rm --privileged -v /tmp/azureimg:/tmp/azuremg fedora:22 bash << 'EOF'
+docker run -i --rm --privileged -v /tmp/azureimg:/tmp/azureimg fedora:22 bash << 'EOF'
 set -eux
 WORKDIR=/workdir
 TMPMNT=/workdir/tmp/mnt
