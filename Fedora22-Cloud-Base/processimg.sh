@@ -87,10 +87,9 @@ chcon --reference ${TMPMNT}/${CLOUDINITLOGCFGFILE} ${TMPMNT}/${AZURECLOUDCFGFILE
 # Install the Azure specific agent
 dnf install -y --installroot ${TMPMNT} WALinuxAgent
 
-# Put in symlink from walinuxagent.service -> waagent.service
-# This is needed because cloud-init run's "service walinuxagent start"
-# on boot.
-ln -s /usr/lib/systemd/system/waagent.service ${TMPMNT}/usr/lib/systemd/system/walinuxagent.service
+# Fix reference to the WALinuxAgent service inside of the Azure datasource. 
+# The Fedora package delivers waagent.service while Ubuntu provides walinuxagent.service.
+sed -i s/walinuxagent/waagent/ ${TMPMNT}/usr/lib/python2.7/site-packages/cloudinit/sources/DataSourceAzure.py
 
 # Install kernel-modules (needed for udf.ko.xz so we can mount the "cdrom"
 # azure attaches to the instance).
