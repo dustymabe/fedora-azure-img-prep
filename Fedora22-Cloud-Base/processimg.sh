@@ -42,6 +42,72 @@ export AZURECLOUDCFGFILE='/etc/cloud/cloud.cfg.d/01_azure.cfg'
 # File to use as reference for selinux 
 export CLOUDINITLOGCFGFILE='/etc/cloud/cloud.cfg.d/05_logging.cfg'
 
+# Contents of waagent.conf that matches what is provided by ubuntu:
+export WAAGENTCONF=$(cat <<END
+#
+# Windows Azure Linux Agent Configuration
+#
+
+# Specified program is invoked with the argument "Ready" when we report ready status
+# to the endpoint server.
+Role.StateConsumer=None
+
+# Specified program is invoked with XML file argument specifying role
+#  configuration.
+Role.ConfigurationConsumer=None
+
+# Specified program is invoked with XML file argument specifying role topology.
+Role.TopologyConsumer=None
+
+# Enable instance creation
+Provisioning.Enabled=n
+
+# Password authentication for root account will be unavailable.
+Provisioning.DeleteRootPassword=n
+
+# Generate fresh host key pair.
+Provisioning.RegenerateSshHostKeyPair=n
+
+# Supported values are "rsa", "dsa" and "ecdsa".
+Provisioning.SshHostKeyPairType=rsa
+
+# Monitor host name changes and publish changes via DHCP requests.
+Provisioning.MonitorHostName=n
+
+# Format if unformatted. If 'n', resource disk will not be mounted.
+ResourceDisk.Format=n
+
+# File system on the resource disk
+# Typically ext3 or ext4. FreeBSD images should use 'ufs2' here.
+ResourceDisk.Filesystem=ext4
+
+# Mount point for the resource disk
+ResourceDisk.MountPoint=/mnt
+
+# NOTE: Ubuntu uses Cloud-init for disk-provisioning. This will
+# unless you disable Cloud-init disk provisioning. Please see
+# /usr/share/doc/walinuxagent/99-cloud-init-disable-diskprovisioning.conf
+#
+# Create and use swapfile on resource disk.
+ResourceDisk.EnableSwap=n
+
+# Size of the swapfile.
+ResourceDisk.SwapSizeMB=0
+
+# Respond to load balancer probes if requested by Windows Azure.
+LBProbeResponder=y
+
+# Enable verbose logging (y|n)
+Logs.Verbose=n
+
+# Root device timeout in seconds.
+OS.RootDeviceScsiTimeout=300
+
+# If "None", the system default version is used.
+OS.OpensslPath=None
+END
+)
+
 # Create workdir and cd to it
 mkdir -p $TMPMNT && cd $WORKDIR
 
@@ -90,6 +156,9 @@ dnf install -y --installroot ${TMPMNT} WALinuxAgent
 # Fix reference to the WALinuxAgent service inside of the Azure datasource. 
 # The Fedora package delivers waagent.service while Ubuntu provides walinuxagent.service.
 sed -i s/walinuxagent/waagent/ ${TMPMNT}/usr/lib/python2.7/site-packages/cloudinit/sources/DataSourceAzure.py
+
+# Populate waagent.conf in image.
+echo "$WAAGENTCONF" > ${TMPMNT}/etc/waagent.conf
 
 # Install kernel-modules (needed for udf.ko.xz so we can mount the "cdrom"
 # azure attaches to the instance).
